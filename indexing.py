@@ -64,5 +64,5 @@ def is_not_duplicate(file_path):
 
 
 if __name__ == "__main__":
-    iterate_through_webpages(WEBPAGES_ROOT)
+    index_webpages(WEBPAGES_ROOT)
     write_index(inverted_index)

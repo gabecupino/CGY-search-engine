@@ -43,12 +43,9 @@ def convert_posting_format(doc_id):
 
 # Returns the corresponding URL of a given docID
 def retrieve_url(bookkeeping_path, doc_id):
-    if len(doc_id.split("/")[1]) <= 3:
-        with open(bookkeeping_path, "r") as url_data_file:
-            data = json.load(url_data_file)
-            return data[doc_id]
-    else:
-        return ""
+    with open(bookkeeping_path, "r") as url_data_file:
+        data = json.load(url_data_file)
+        return data[doc_id]
 
 # Prints out all the URLs corresponding to a list of pre-formatted docIDs
 def print_urls(bookkeeping_path, postings):
@@ -73,11 +70,10 @@ def write_urls_to_file(write_path, bookkeeping_path, postings, max_results):
         url_count = 0
         for posting in postings[:-1]:
             url = retrieve_url(bookkeeping_path, convert_posting_format(posting))
-            if len(url) > 0:
-                results.write((url + "\n").encode("utf-8"))
-                url_count += 1
-                if (url_count >= max_results):
-                    break
+            results.write((url + "\n").encode("utf-8"))
+            url_count += 1
+            if (url_count >= max_results):
+                break
         results.write(("\nNumber of URLs retrieved: " + str(url_count) + "\n\n\n").encode("utf-8"))
 
 if __name__ == "__main__":
