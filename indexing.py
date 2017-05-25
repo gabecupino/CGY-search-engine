@@ -2,13 +2,18 @@ from bs4 import BeautifulSoup
 import os
 import nltk
 
+# Note: we should stem and compress index
+
+# Necessary to work around using nltk library
 nltk.download('punkt')
 
+#
 WEBPAGES_ROOT = "WEBPAGES_CLEAN"
 inverted_index = dict()
-pattern = "[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+"
+TOKEN_REGEX_PATTERN = "[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+"
 
-def iterate_through_webpages(root):
+# iterates through webpages directory
+def index_webpages(root):
     for dir_name in os.listdir(root):
         dir_path = root + '/' + dir_name
         if os.path.isdir(dir_path):
@@ -18,11 +23,12 @@ def iterate_through_webpages(root):
 
 
 def index_file(file_path):
-    with open(file_path) as file:
-        soup = BeautifulSoup(file, "lxml")
-    for tag in soup.findAll(True):
-        tokens = nltk.regexp_tokenize(tag.text, pattern)
-        update_index(tokens, file_path_to_docid(file_path))
+    if is_not_duplicate(file_path):
+        with open(file_path) as file:
+            soup = BeautifulSoup(file, "lxml")
+            for tag in soup.findAll(True):
+                tokens = nltk.regexp_tokenize(tag.text, TOKEN_REGEX_PATTERN)
+                update_index(tokens, file_path_to_docid(file_path))
 
 
 def update_index(tokens, doc_id):
@@ -38,6 +44,7 @@ def update_posting_list(token, doc_id):
         inverted_index[token] =  set()
     inverted_index[token].add(doc_id)
 
+
 def file_path_to_docid(file_path):
     paths = file_path.split('/')
     return paths[1] + "." + paths[2]
@@ -51,6 +58,9 @@ def write_index(index_dict):
                 index.write((doc_id + ";").encode("utf-8"))
             index.write(("\n").encode("utf-8"))
 
+def is_not_duplicate(file_path):
+    paths = file_path.split('/')
+    return len(paths[2]) <= 3
 
 
 if __name__ == "__main__":
