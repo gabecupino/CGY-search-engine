@@ -1,5 +1,6 @@
 import json
 
+# Global variables
 INDEX_PATH = "index.txt"
 BOOKKEEPING_PATH = "WEBPAGES_CLEAN/bookkeeping.json"
 WRITE_PATH = "query_results.txt"
