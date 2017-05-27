@@ -1,11 +1,12 @@
 from bs4 import BeautifulSoup
 import os
 import nltk
-
+from nltk.stem.snowball import SnowballStemmer
 # Note: we should stem and compress index
 
 # Necessary to work around using nltk library
 nltk.download('punkt')
+nltk.download('stopwords')
 
 # Global variables
 WEBPAGES_ROOT = "WEBPAGES_CLEAN"
@@ -28,8 +29,11 @@ def index_file(file_path):
     if is_not_duplicate(file_path):
         with open(file_path) as file:
             soup = BeautifulSoup(file, "lxml")
+            stemmer = SnowballStemmer("english", ignore_stopwords=True)
             for tag in soup.findAll(True):
                 tokens = nltk.regexp_tokenize(tag.text, TOKEN_REGEX_PATTERN)
+                tokens = [stemmer.stem(token) for token in tokens]
+
                 update_index(tokens, file_path_to_docid(file_path))
 
 # given a list of tokens, updates index dictionary using
