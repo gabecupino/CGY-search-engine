@@ -81,7 +81,9 @@ def file_path_to_docid(file_path):
 # writes inverted index dictionary to a file in a parse-able format
 # token is separated from its posting list by ":"
 # each doc in posting list is separated by ";"
-# Format>>: Token:doc_freq|doc_id-multiplier-token_freq;doc_id-multiplier-token_freq,....
+# Format>>:
+# index_size(num lines)
+# Token:doc_freq|doc_id-multiplier-token_freq;doc_id-multiplier-token_freq,....
 def write_index(index_dict):
     with open("index.txt", "wb") as index:
         index.write(str(len(index_dict)) + "\n") # Write index size header

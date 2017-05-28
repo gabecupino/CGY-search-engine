@@ -13,7 +13,7 @@ def run_query_program():
     query = prompt_query()
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     write_query_header(WRITE_PATH, query)
-    index_size = 0
+    index_size = 0 # To be read later when retrieving postings
 
     query = stemmer.stem(query)
     postings = retrieve_postings(query, INDEX_PATH,index_size)
@@ -34,7 +34,7 @@ def prompt_query():
 # docIDs associated with the term
 def retrieve_postings(query, index_path, index_size):
     with open(index_path, "r", encoding='utf8') as index:
-        index_size = int(index.readline())
+        index_size = int(index.readline()) # Read index size
         for line in index:
             term_posting = line.split(":")
             if query.lower() == term_posting[0]:
