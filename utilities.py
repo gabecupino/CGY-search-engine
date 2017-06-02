@@ -50,3 +50,5 @@ def log_freq_weight(term_freq):
 
 def inverse_doc_freq(doc_freq, index_size):
     return log10(index_size/doc_freq)
+
+    
