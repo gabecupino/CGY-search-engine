@@ -1,10 +1,10 @@
-import tkinter
+import Tkinter
 import search
 
 class SearchApplication:
 
     def __init__(self):
-        self._search_window = tkinter.Tk()
+        self._search_window = Tkinter.Tk()
 
     def start(self):
         self._search_window.mainloop()
@@ -17,4 +17,5 @@ class SearchApplication:
 
 
 if __name__ == '__main__':
+    print("TEST")
     SearchApplication.start()
