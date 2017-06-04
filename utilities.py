@@ -15,7 +15,7 @@ def retrieve_url(bookkeeping_path, doc_id):
 
 # Prints out all the URLs corresponding to a list of pre-formatted docIDs
 def print_urls(bookkeeping_path, postings):
-    for posting in postings[:-1]:
+    for posting in postings:
         print retrieve_url(bookkeeping_path, convert_posting_format(posting))
 
 # Writes to file a header for a query
@@ -51,4 +51,30 @@ def log_freq_weight(term_freq):
 def inverse_doc_freq(doc_freq, index_size):
     return log10(index_size/doc_freq)
 
-    
+def get_doc_ids_and_scores(doc_ids_intersection, query_term_postings):
+    # Params: doc_ids_intersection = set(doc_ids)
+    #         query_term_postings = query_term: {doc_id: score}; Contains postings for a query term
+    doc_id_and_scores = []
+
+    # Add up all the scores of doc_ids that contain every query term
+    for doc_id in doc_ids_intersection:
+        total_score = 0  # combined score for a doc and all query terms
+
+        for query_term, postings in query_term_postings.items():
+            score = postings.get(doc_id)
+            total_score += score
+
+        doc_id_and_scores.append((doc_id, total_score))
+
+    return doc_id_and_scores
+
+def get_sorted_doc_ids(doc_ids_and_scores):
+    # Param: [(doc_id, score)]
+
+    # Sort doc_ids by scores
+    sorted_doc_id_and_scores = sorted(doc_ids_and_scores, key=lambda doc_info: doc_info[1], reverse=True)
+
+    # List all doc_ids (pre-sorted)
+    results = [doc_id_and_score[0] for doc_id_and_score in sorted_doc_id_and_scores]
+
+    return results
