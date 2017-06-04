@@ -7,16 +7,12 @@ from search_gui import *
 INDEX_PATH = "index.txt"
 BOOKKEEPING_PATH = "WEBPAGES_CLEAN/bookkeeping.json"
 WRITE_PATH = "query_results.txt"
-MAX_RESULTS = 35000
+MAX_RESULTS = 10
 
 
 # Prompts user for a query and prints out all the URLs as results of the query
-def run_query_program():
-    
-    query = prompt_query()
-    SearchApplication().start()
-   
-    
+def run_query_program(query):
+
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     #write_query_header(WRITE_PATH, query)
     stop_words = set(stopwords.words('english'))
