@@ -98,7 +98,7 @@ def write_index(index_dict):
 
 
 # check to see if the document is not a duplicate given its file path
-# specific for the format of this assignment (file name is never more than 3 characters long)
+# specific for the format of this assignment (file name is never more than 3 characters long) TEST
 def is_not_duplicate(file_path):
     paths = file_path.split('/')
     return len(paths[2]) <= 3
