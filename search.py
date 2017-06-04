@@ -1,4 +1,5 @@
 from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import stopwords
 from utilities import *
 
 # Global variables
@@ -12,14 +13,31 @@ MAX_RESULTS = 35000
 def run_query_program():
     query = prompt_query()
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
-    write_query_header(WRITE_PATH, query)
-    index_size = 0 # To be read later when retrieving postings
+    #write_query_header(WRITE_PATH, query)
+    stop_words = set(stopwords.words('english'))
 
-    query = stemmer.stem(query)
-    postings = retrieve_postings(query, INDEX_PATH,index_size)
+    query_terms = [stemmer.stem(query_term) for query_term in query.split() if query_term not in stop_words]
+    # Bug: stemming removes quotes
 
-    if len(postings) > 0:
-        print_urls(BOOKKEEPING_PATH, postings)
+    query_term_postings = dict() # Format: query_term: {doc_id: score}; Contains postings for a query term
+    doc_ids_intersection = None # Set of doc_ids
+
+    for query_term in query_terms:
+        postings = retrieve_postings(query_term, INDEX_PATH) # postings are {doc_id: score}
+        query_term_postings[query_term] = postings
+
+        if doc_ids_intersection is None:
+            doc_ids_intersection = set([doc_id for doc_id in postings.keys()]) # Initialize doc_id_intersection set
+
+        else:
+            doc_ids_intersection.intersection_update([doc_id for doc_id in postings.keys()]) # Update intersection set
+
+    doc_id_and_scores = get_doc_ids_and_scores(doc_ids_intersection, query_term_postings)
+
+    sorted_doc_ids = get_sorted_doc_ids(doc_id_and_scores)
+
+    if len(sorted_doc_ids) > 0:
+        print_urls(BOOKKEEPING_PATH, sorted_doc_ids)
         #write_urls_to_file(WRITE_PATH, BOOKKEEPING_PATH, postings, MAX_RESULTS)
     else:
         print "No results found for given query: ", query
@@ -31,8 +49,8 @@ def prompt_query():
     return raw_input("Enter your query: ")
 
 # Searches index file for single query term and returns a list of
-# docIDs associated with the term
-def retrieve_postings(query, index_path, index_size):
+# (docIDs, scores) associated with the term
+def retrieve_postings(query, index_path):
     with open(index_path, "r", encoding='utf8') as index:
         index_size = int(index.readline()) # Read index size
         for line in index:
@@ -40,12 +58,12 @@ def retrieve_postings(query, index_path, index_size):
             if query.lower() == term_posting[0]:
 
                 return process_raw_postings(term_posting[1], index_size)
-    return list()
+    return dict()
 
-# Takes raw posting list string and returns a list of docIDs
+# Takes raw posting list string and returns a dict of docIDs:score
 # Postings format>>: doc_freq|doc_id-multiplier-token_freq;doc_id-multiplier-token_freq,....
 def process_raw_postings(postings, index_size):
-    doc_id_and_scores = list() # List of (doc_id, score)
+    doc_id_and_scores = dict() # dict of docIDs:score
 
     doc_freq_end_index = postings.find("|") # Find | delimiter that ends the doc_freq number
     doc_freq = postings[:doc_freq_end_index]
@@ -64,17 +82,9 @@ def process_raw_postings(postings, index_size):
             idf_weight = inverse_doc_freq(int(doc_freq), index_size)
 
             tf_idf_score = tf_weight * idf_weight * int(tag_multiplier)
-            doc_id_and_scores.append((doc_id, tf_idf_score)) # Append to list of (doc_id, score)
+            doc_id_and_scores[doc_id] = tf_idf_score # Append to list of (doc_id, score)
 
-    # Sort the documents by score
-    sorted_doc_id_and_scores = sorted(doc_id_and_scores, key = lambda doc_info: doc_info[1], reverse= True)
-
-    print "doc id, score"
-    for (doc_id, score) in sorted_doc_id_and_scores:
-        print doc_id, score
-
-    return [doc_id_and_score[0] for doc_id_and_score in sorted_doc_id_and_scores] # Return sorted list of only the doc_ids
-
+    return doc_id_and_scores
 
 if __name__ == "__main__":
     run_query_program()
