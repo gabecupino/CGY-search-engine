@@ -11,7 +11,42 @@ MAX_RESULTS = 10
 
 
 # Prompts user for a query and prints out all the URLs as results of the query
-def run_query_program(query):
+def run_query_program():
+
+    query = prompt_query()
+    stemmer = SnowballStemmer("english", ignore_stopwords=True)
+    #write_query_header(WRITE_PATH, query)
+    stop_words = set(stopwords.words('english'))
+
+    query_terms = [stemmer.stem(query_term) for query_term in query.split() if query_term not in stop_words]
+    # Bug: stemming removes quotes
+
+    query_term_postings = dict() # Format: query_term: {doc_id: score}; Contains postings for a query term
+    doc_ids_intersection = None # Set of doc_ids
+
+    for query_term in query_terms:
+        postings = retrieve_postings(query_term, INDEX_PATH) # postings are {doc_id: score}
+        query_term_postings[query_term] = postings
+
+        if doc_ids_intersection is None:
+            doc_ids_intersection = set([doc_id for doc_id in postings.keys()]) # Initialize doc_id_intersection set
+
+        else:
+            doc_ids_intersection.intersection_update([doc_id for doc_id in postings.keys()]) # Update intersection set
+
+    doc_id_and_scores = get_doc_ids_and_scores(doc_ids_intersection, query_term_postings)
+
+    sorted_doc_ids = get_sorted_doc_ids(doc_id_and_scores)
+
+    if len(sorted_doc_ids) > 0:
+        print_urls(BOOKKEEPING_PATH, sorted_doc_ids)
+        #write_urls_to_file(WRITE_PATH, BOOKKEEPING_PATH, postings, MAX_RESULTS)
+    else:
+        print "No results found for given query: ", query
+        #write_no_results(WRITE_PATH, query)
+
+# Prompts user for a query and prints out all the URLs as results of the query
+def run_query_program_with_params(query):
 
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     #write_query_header(WRITE_PATH, query)
@@ -79,7 +114,7 @@ def process_raw_postings(postings, index_size):
             #print doc_id, tag_multiplier, term_freq, doc_freq
 
             # Calculate tf-idf weight scores
-            tf_weight = log_freq_weight(int(term_freq))
+            tf_weight =  1 + log_freq_weight(int(term_freq))
             idf_weight = inverse_doc_freq(int(doc_freq), index_size)
 
             tf_idf_score = tf_weight * idf_weight * int(tag_multiplier)

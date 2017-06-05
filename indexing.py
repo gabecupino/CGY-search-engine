@@ -93,6 +93,8 @@ def update_posting_list(token, doc_id):
 def update_token_frequency(token, doc_id, tag_multiplier):
     # Updates the token frequency in the inverted index
     posting_list = token_freqs.setdefault(token, {doc_id: [tag_multiplier, 0]}) # Set with default posting list
+    if tag_multiplier > posting_list.get(doc_id, [tag_multiplier, 0])[0]:
+        posting_list[0] = tag_multiplier # Update tag multiplier if current is greater than previous
     doc_meta_info = posting_list.get(doc_id, [tag_multiplier, 0]) # Get with default doc info
     doc_meta_info[-1] += 1
     posting_list[doc_id] = doc_meta_info
