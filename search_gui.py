@@ -37,7 +37,7 @@ class SearchApplication():
     def _display_results(self, urls):
         self._results_window = Tk()
         self._results_window.title("Search Results")
-        self._results_window.minsize(300, 300)
+        self._results_window.minsize(300, 30)
         self._results_window.protocol("WM_DELETE_WINDOW", self._on_closing)
         counter = 1
         for url in urls:
@@ -45,6 +45,11 @@ class SearchApplication():
             button = Button(master=self._results_window, text=button_text, command=lambda u=url:self._on_click_result(u))
             button.grid(row=counter-1, column=0)
             counter += 1
+
+        print len(urls)
+        if len(urls) == 0:
+            message = Label(self._results_window, text="No results found")
+            message.pack()
 
 
     def _on_click_result(self, url):
