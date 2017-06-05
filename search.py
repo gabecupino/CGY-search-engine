@@ -39,7 +39,7 @@ def run_query_program():
     sorted_doc_ids = get_sorted_doc_ids(doc_id_and_scores)
 
     if len(sorted_doc_ids) > 0:
-        print_urls(BOOKKEEPING_PATH, sorted_doc_ids)
+        print_urls(BOOKKEEPING_PATH, sorted_doc_ids, MAX_RESULTS)
         #write_urls_to_file(WRITE_PATH, BOOKKEEPING_PATH, postings, MAX_RESULTS)
     else:
         print "No results found for given query: ", query
@@ -114,7 +114,7 @@ def process_raw_postings(postings, index_size):
             #print doc_id, tag_multiplier, term_freq, doc_freq
 
             # Calculate tf-idf weight scores
-            tf_weight =  1 + log_freq_weight(int(term_freq))
+            tf_weight =  1 +log_freq_weight(int(term_freq))
             idf_weight = inverse_doc_freq(int(doc_freq), index_size)
 
             tf_idf_score = tf_weight * idf_weight * int(tag_multiplier)
