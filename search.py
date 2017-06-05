@@ -14,12 +14,20 @@ MAX_RESULTS = 20
 def run_query_program():
 
     query = prompt_query()
+    if len(query.strip()) == 0:
+        # Strip removes excess white spaces
+        print "Error: Empty query"
+        return
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     #write_query_header(WRITE_PATH, query)
     stop_words = set(stopwords.words('english'))
 
     query_terms = [stemmer.stem(query_term) for query_term in query.split() if query_term not in stop_words]
     # Bug: stemming removes quotes
+    if len(query_terms) == 0:
+        # Handles query that only has stop words
+        print "Error: Ambiguous query"
+        return
 
     query_term_postings = dict() # Format: query_term: {doc_id: score}; Contains postings for a query term
     doc_ids_intersection = None # Set of doc_ids
@@ -47,7 +55,9 @@ def run_query_program():
 
 # Prompts user for a query and prints out all the URLs as results of the query
 def run_query_program_with_params(query):
-    if len(query) == 0:
+
+    if len(query.strip()) == 0:
+        # Strip removes excess white spaces
         return []
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     #write_query_header(WRITE_PATH, query)
@@ -56,6 +66,9 @@ def run_query_program_with_params(query):
     query_terms = [stemmer.stem(query_term) for query_term in query.split() if query_term not in stop_words]
     # Bug: stemming removes quotes
 
+    if len(query_terms) == 0:
+        # Handles query that only has stop words
+        return []
     query_term_postings = dict() # Format: query_term: {doc_id: score}; Contains postings for a query term
     doc_ids_intersection = None # Set of doc_ids
 
