@@ -14,6 +14,7 @@ def retrieve_url(bookkeeping_path, doc_id):
         return data[doc_id]
 
 # Prints out all the URLs corresponding to a list of pre-formatted docIDs
+# Number of URLs depends on result_count_cap parameter
 def print_urls(bookkeeping_path, postings, result_count_cap):
     counter = 0
     for posting in postings:
@@ -21,6 +22,18 @@ def print_urls(bookkeeping_path, postings, result_count_cap):
         counter += 1
         if (counter >= result_count_cap):
             break
+
+# Returns the URLs corresponding to a list of pre-formatted docIDs
+# Number of URLs depends on result_count_cap parameter
+def get_urls(bookkeeping_path, postings, result_count_cap):
+    counter = 0
+    resulting_urls = []
+    for posting in postings:
+        resulting_urls.append(retrieve_url(bookkeeping_path, convert_posting_format(posting)))
+        counter += 1
+        if (counter >= result_count_cap):
+            break
+    return resulting_urls
 
 # Writes to file a header for a query
 def write_query_header(write_path, query):

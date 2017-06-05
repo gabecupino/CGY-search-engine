@@ -47,7 +47,8 @@ def run_query_program():
 
 # Prompts user for a query and prints out all the URLs as results of the query
 def run_query_program_with_params(query):
-
+    if len(query) == 0:
+        return []
     stemmer = SnowballStemmer("english", ignore_stopwords=True)
     #write_query_header(WRITE_PATH, query)
     stop_words = set(stopwords.words('english'))
@@ -73,11 +74,9 @@ def run_query_program_with_params(query):
     sorted_doc_ids = get_sorted_doc_ids(doc_id_and_scores)
 
     if len(sorted_doc_ids) > 0:
-        print_urls(BOOKKEEPING_PATH, sorted_doc_ids)
-        #write_urls_to_file(WRITE_PATH, BOOKKEEPING_PATH, postings, MAX_RESULTS)
+        return get_urls(BOOKKEEPING_PATH, sorted_doc_ids, MAX_RESULTS)
     else:
-        print "No results found for given query: ", query
-        #write_no_results(WRITE_PATH, query)
+        return []
 
 
 # Prompts user for a query and returns the user input as a string
