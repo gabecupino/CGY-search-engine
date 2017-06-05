@@ -7,7 +7,7 @@ from search_gui import *
 INDEX_PATH = "index.txt"
 BOOKKEEPING_PATH = "WEBPAGES_CLEAN/bookkeeping.json"
 WRITE_PATH = "query_results.txt"
-MAX_RESULTS = 10
+MAX_RESULTS = 20
 
 
 # Prompts user for a query and prints out all the URLs as results of the query
