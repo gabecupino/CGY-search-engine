@@ -43,7 +43,6 @@ def index_webpages(root):
 def index_file(file_path):
     if is_not_duplicate(file_path):
         with open(file_path, encoding='utf8') as file:
-            print ("Test")
             soup = BeautifulSoup(file, "lxml")
             stemmer = SnowballStemmer("english", ignore_stopwords=True) # Stopwords are useless/ common words; Don't stem
             stop_words = set(stopwords.words('english'))
