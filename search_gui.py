@@ -24,14 +24,13 @@ class SearchApplication():
         self._search_window.mainloop()
 
     def _get_query(self):
-        print ("hi", E1.get())
         return E1.get()
 
 
     def _on_search_button(self):
         query = self._get_query()
         urls = search.run_query_program_with_params(query)
-        if (hasattr(self, "_results_window")):
+        if (hasattr(self, "_results_window") and self._results_window != ""):
             self._results_window.destroy()
         self._display_results(urls)
 
@@ -39,6 +38,7 @@ class SearchApplication():
         self._results_window = Tk()
         self._results_window.title("Search Results")
         self._results_window.minsize(300, 300)
+        self._results_window.protocol("WM_DELETE_WINDOW", self._on_closing)
         counter = 1
         for url in urls:
             button_text = str(counter) + ": "+ url
@@ -49,6 +49,10 @@ class SearchApplication():
 
     def _on_click_result(self, url):
         webbrowser.open("http://" + url)
+
+    def _on_closing(self):
+        self._results_window.destroy()
+        self._results_window = ""
 
 
 if __name__ == '__main__':
